@@ -1,5 +1,5 @@
-/* ~ ~ ~ Yeatzee ! ~ ~ ~ */
-/* Made by @Blyy_ | GP in 2022 */
+// Yeatzee !
+// Made by @Blyy_ | GP in 2022
 
 	@import (css) url('https://fonts.googleapis.com/css2?family=Abel&family=Sigmar+One&display=swap');
 
@@ -56,19 +56,8 @@
 
 // All
 
-	*{
-		box-sizing: border-box;
-		padding: 0;
-		margin: 0;
-		user-select: none;
-	}
+	#app-yeahtzee{
 
-	body{
-		background-color: @bg;
-		.abel(1rem, @grey, normal);
-	}
-
-	#app{
 		overflow: hidden;
 		position: relative;
 		width: 100%;
@@ -78,683 +67,684 @@
 
 		box-shadow: 0 0 30px fade(@black, 30%);
 		background-color: @green_dark;
+		.abel(1rem, @grey, normal);
+
+		// Mobile simulation
+		@media screen and (min-height: 880px){
+			max-width: 500px;
+			border-radius: 8px;
+			height: calc(100vh - 40px);
+			margin-top: 20px;
+		}
+
 	}
 
 	button{
 		cursor: pointer;
 	}
 
-	// Mobile simulation
-	@media screen and (min-height: 880px){
-		#app{
-			max-width: 500px;
+	// Template
+
+		button.primary{
+			display: block;
 			border-radius: 8px;
-			height: calc(100vh - 40px);
-			margin-top: 20px;
-		}
-	}
+			border: none;
+			padding: 13px 0;
 
-// Template
+			background: repeating-linear-gradient(
+				-45deg,
+				@red,
+				@red 6px,
+				fade(@red_dark, 15%) 7px,
+				fade(@red_dark, 15%) 10px
+			), @red;
+			box-shadow: 0 5px 0 0 @red_dark,
+						0 5px 10px 0 fade(@black, 15%);
 
-	button.primary{
-		display: block;
-		border-radius: 8px;
-		border: none;
-		padding: 13px 0;
+			.abel(1.35rem, @white, bold);
+			letter-spacing: 0.5px;
+			text-align: center;
+			text-shadow: 0 2px 1px @red_dark;
 
-		background: repeating-linear-gradient(
-			-45deg,
-			@red,
-			@red 6px,
-			fade(@red_dark, 15%) 7px,
-			fade(@red_dark, 15%) 10px
-		), @red;
-		box-shadow: 0 5px 0 0 @red_dark,
-					0 5px 10px 0 fade(@black, 15%);
+			cursor: pointer;
 
-		.abel(1.35rem, @white, bold);
-		letter-spacing: 0.5px;
-		text-align: center;
-		text-shadow: 0 2px 1px @red_dark;
-
-		cursor: pointer;
-
-		&:active,
-		&:hover{
-			box-shadow: 0 0px 8px 0 fade(@black, 20%);
-		}
-	}
-
-// Header
-
-	header#header_game{
-		.absPos(500);
-		background-color: @green_dark;
-		width: 100%;
-		padding: 20px;
-		padding-bottom: 15px;
-		position: relative;
-
-		h1{
-			.sigmar(2.25rem, @white, normal);
-			letter-spacing: -2px;
-			line-height: 1;
-			text-shadow: 0 2px 1px @green, 0 3px 5px fade(black, 30%);
-
-			span{
-				color: @red;
-				text-shadow: 0 2px 1px @red_dark, 0 3px 5px fade(black, 30%);
+			&:active,
+			&:hover{
+				box-shadow: 0 0px 8px 0 fade(@black, 20%);
 			}
 		}
 
-		.title_step{
+	// Header
+
+		header#header_game{
+			.absPos(500);
+			background-color: @green_dark;
+			width: 100%;
+			padding: 20px;
+			padding-bottom: 15px;
+			position: relative;
+
+			h1{
+				.sigmar(2.25rem, @white, normal);
+				letter-spacing: -2px;
+				line-height: 1;
+				text-shadow: 0 2px 1px @green, 0 3px 5px fade(black, 30%);
+
+				span{
+					color: @red;
+					text-shadow: 0 2px 1px @red_dark, 0 3px 5px fade(black, 30%);
+				}
+			}
+
+			.title_step{
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				position: absolute;
+				top: 100%;
+				left: 0;
+				right: 0;
+				z-index: 300;
+
+				div{
+					position: relative;
+					flex: 1;
+					height: 5px;
+					background: fade(#000, 30%);
+
+					&:before{
+						content: '';
+						display: block;
+						background-color: red;
+						width: 0;
+						height: 5px;
+						position: absolute;
+						top: 0;
+						left: 0;
+
+						.transition(width, 1.5s);
+						transition-delay: 750;
+					}
+
+					& + div{
+						margin-left: 3px;
+					}
+				}
+
+				&.step_1 div:first-child,
+				&.step_2 div:first-child,
+				&.step_2 div:nth-child(2),
+				&.step_3 > div{
+					&:before{
+						width: 100%;
+						box-shadow: 0 0 10px fade(red, 50%);
+					}
+				}
+			}
+
+			#score_btn{
+				position: absolute;
+				top: 20px;
+				right: 20px;
+				z-index: 50;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border: none;
+				background: transparent;
+				background-color: @red;
+				border-radius: 60px;
+				overflow: hidden;
+				padding: 6px 13px 8px;
+				cursor: pointer;
+
+				span{
+					line-height: 1;
+					color: transparent;
+					text-shadow: 0 0 0 @white, 0 2px 1px @red_dark;
+					font-size: 1.15rem;
+					margin-right: 5px;
+				}
+
+				.abel(1.25rem, @white, bold);
+				.transition();
+
+				text-shadow: 0 2px 1px @red_dark;
+				box-shadow: 0 3px 0 0 @red_dark,
+						0 3px 8px 0 fade(@black, 15%);
+
+				&:hover{
+					top: 33px;
+					box-shadow: 0 0px 6px 0 fade(@black, 20%);
+				}
+
+			}
+
+			.title_pseudo{
+				margin-top: 20px;
+				padding: 2px;
+				text-align: center;
+				.abel(1.25rem, @white);
+				background-color: fade(@black, 50%);
+
+				span{
+					font-weight: bold;
+					color: @green;
+				}
+			}
+
+		}
+
+	// LOBBY
+
+		#lobby{
+			padding: 30px;
+			.absPos();
+
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+
+			.new_player_form{
+				margin-top: auto;
+				width: 100%;
+				text-align: center;
+
+				h3{
+					margin-bottom: 15px;
+					.abel(1.75rem, @white, bold);
+				}
+
+				input{
+					display: block;
+					width: 100%;
+					margin-bottom: 5px;
+					padding: 25px 10px;
+					border: none;
+					border-radius: 5px;
+					.abel(1.35rem, @grey_black, bold);
+					text-align: center;
+
+					&:hover, &:active, &:focus{
+						outline: none;
+					}
+				}
+
+				button{
+					position: relative;
+					top: -15px;
+					margin: 0 auto;
+					padding: 12px 50px;
+					background-color: @green;
+					border: none;
+					border-radius: 60px;
+					border: 2px solid @green_dark;
+					.abel(1.3rem, @black, bold);
+				}
+			}
+
+			.players_list{
+				margin: auto 0;
+				padding: 30px 15px;
+
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-wrap: wrap;
+
+				div{
+					padding: 5px 25px;
+					margin: 8px;
+					.abel(2rem, @green_dark, bold);
+					background-color: @gold;
+					border-radius: 100px;
+				}
+			}
+
+			button.start_game_btn{
+				margin: 30px 0;
+				width: 100%;
+
+				&:hover{
+					transform: translateY(5px);
+				}
+			}
+
+		}
+
+	// DICES
+
+		.dice{
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
-			position: absolute;
-			top: 100%;
-			left: 0;
-			right: 0;
-			z-index: 300;
+			justify-content: center;
+			width: 60px;
+			height: 60px;
 
-			div{
+			border: 5px solid @dice;
+			border-radius: 8px;
+			background-color: @dice_bg;
+			box-shadow: 0px 0px 10px fade(@black, 20%);
+
+			svg{
+				width: 80%;
+				fill: @dice;
+				filter: drop-shadow(0px 0px 3px fade(@dice, 30%));
+			}
+
+			pointer-events: auto;
+			cursor: pointer;
+			opacity: 1;
+
+			&.invisible{
+				pointer-events: none;
+				visibility: hidden;
+				opacity: 0;
+				.transition(opacity, .35s);
+			}
+		}
+
+	// GAME
+
+		#game{
+			.absPos();
+
+			width: 100%;
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			background-color: @green;
+
+			.dices_arena{
 				position: relative;
-				flex: 1;
-				height: 5px;
-				background: fade(#000, 30%);
+				flex: 1 auto;
+				width: 100%;
+				padding-bottom: 30px;
+
+				& > div{
+					width: 100%;
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+
+					align-items: center;
+					justify-content: space-evenly;
+				}
+			}
+
+			.dices_keep{
+				position: relative;
+				background: repeating-linear-gradient(
+					-45deg,
+					@green_dark,
+					@green_dark 12px,
+					fade(@black, 10%) 12px,
+					fade(@black, 10%) 18px
+				), @green_dark;
+
+				height: 20vh;
+				min-height: 120px;
+				display: flex;
+				align-items: center;
+
+				& > div{
+					width: 100%;
+					padding: 8px 30px 0;
+					position: relative;
+				}
+
+				.dice{
+					display: inline-flex;
+					border-color: @black;
+					width: 48px;
+					height: 48px;
+					margin-left: 10px;
+
+					svg{
+						fill: @black;
+					}
+				}
 
 				&:before{
 					content: '';
 					display: block;
-					background-color: red;
-					width: 0;
-					height: 5px;
 					position: absolute;
-					top: 0;
-					left: 0;
+					background: darken(@green_dark, 8%);
+					opacity: .9;
 
-					.transition(width, 1.5s);
-					transition-delay: 750;
-				}
+					@pos: 10px;
+						top: @pos;
+						right: @pos;
+						bottom: @pos;
+						left: @pos;
+					border: 1px solid @white;
+					border-radius: 15px;
+					box-shadow: 0 0 8px fade(@white, 70%), inset 0 0 6px fade(@white, 55%);
 
-				& + div{
-					margin-left: 3px;
+					user-select: none;
+					pointer-events: none;
 				}
 			}
 
-			&.step_1 div:first-child,
-			&.step_2 div:first-child,
-			&.step_2 div:nth-child(2),
-			&.step_3 > div{
-				&:before{
-					width: 100%;
-					box-shadow: 0 0 10px fade(red, 50%);
+			#play_btn{
+				position: absolute;
+				transform: translateY(50%);
+				bottom: 5px;
+				left: 50px;
+				right: 50px;
+				z-index: 200;
+
+				&:active,
+				&:hover{
+					bottom: 0px;
 				}
 			}
 		}
 
-		#score_btn{
-			position: absolute;
-			top: 20px;
-			right: 20px;
-			z-index: 50;
+	// SCOREBOARD
+
+		#scoreboard{
+			.absPos(900);
+			overflow-y: scroll;
+			background: fade(@white, 80%);
+			backdrop-filter: blur(5px) saturate(0.25);
+			padding: 75px 10px 15px;
+			padding-top: 75px;
+
+			// Scroll bar
+				&::-webkit-scrollbar {
+					width: 8px;
+				}
+				&::-webkit-scrollbar-track {
+					background: transparent;
+				}
+				&::-webkit-scrollbar-thumb {
+					background: @red;
+					border: 2px solid transparent;
+					border-radius:12px;
+				}
+				&::-webkit-scrollbar-thumb:hover {
+					background: @red_dark;
+				}
+				&::-webkit-scrollbar-button {
+					display:none
+				}
+
+			.close_score{
+				position: absolute;
+				top: 30px;
+				right: 30px - 8;
+				z-index: 999;
+				border: none;
+				background-color: @red;
+				border-radius: 100px;
+				overflow: hidden;
+				padding: 8px 45px;
+
+				font-size: 1.5rem;
+				color: @white;
+				font-weight: bold;
+				line-height: 1;
+
+				text-shadow: 0 2px 1px @red_dark;
+				box-shadow: 0 3px 0 0 @red_dark,
+						0 3px 8px 0 fade(@black, 15%);
+
+				&:hover{
+					top: 33px;
+					box-shadow: 0 0px 6px 0 fade(@black, 20%);
+				}
+			}
+
+			.scoreboard_title{
+				text-align: center;
+				.abel(1.5rem, @grey_black, bold);
+				margin: 15px auto;
+
+				span{
+					color: @green;
+					text-shadow: 0 0 3px @white;
+				}
+			}
+
+			.score_warp{
+				padding-left: 10px;
+				padding-right: 50px;
+
+				.line{
+					position: relative;
+					background-color: @white;
+					display: flex;
+					border: 1px solid @grey_dark;
+					border-bottom: none;
+
+					.abel(1rem, @grey, normal);
+
+					& > div{
+						flex: 2;
+						height: 32px;
+						line-height: 32px;
+						padding: 0 8px;
+						border-right: 1px solid #000;
+
+						&.name{
+							font-size: .9rem;
+							font-weight: bold;
+							text-align: right;
+
+							span{
+								display: none !important;
+							}
+						}
+
+						&.scoring{
+							text-align: center;
+							font-size: .8rem;
+						}
+
+						&.player_score{
+							flex: 1.5;
+							text-align: center;
+							font-weight: bold;
+						}
+					}
+
+					.choose_this{
+						position: absolute;
+						left: 100%;
+						top: 0;
+						bottom: 0px;
+
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						height: auto;
+						width: 48px;
+						padding: 0;
+						padding-top: 5px;
+						background: @red;
+						border: 2px solid @red_dark;
+						border-left: none;
+						border-top-right-radius: 5px;
+						border-bottom-right-radius: 5px;
+
+						font-weight: bold;
+						color: @white;
+						cursor: pointer;
+
+						&.cancel{
+							border-color: @grey_black;
+							background: repeating-linear-gradient(
+								-45deg,
+								@grey,
+								@grey 4px,
+								@grey_dark 4px,
+								@grey_dark 8px
+							);
+							span{
+								display: none;
+							}
+						}
+
+						&:hover{
+							background: @green;
+						}
+					}
+
+					&.head_line{
+						background-color: @green_dark;
+						.abel(.9rem, @white, normal);
+						text-transform: uppercase;
+
+						& > div{
+							text-align: center;
+							border: none;
+						}
+						.lh_player_score{
+							flex: 1.5;
+						}
+					}
+
+					&.bonus{
+						background-color: #ccc;
+						border-bottom: 4px solid @green_dark;
+						.player_score{
+							color: @red;
+						}
+					}
+
+					&.total{
+						background-color: @grey_dark;
+						& > div{
+							color: @white;
+							border: none;
+
+							&.name{
+								flex: 5;
+							}
+							&.scoring{
+								display: none;
+							}
+						}
+					}
+
+					&.done:not(.total, .bonus){
+						background: fade(@green, 35%);
+					}
+				}
+
+				&.bonus_on .bonus{
+					background-color: @green;
+
+					.player_score{
+						color: @grey;
+						font-size: 0;
+
+						&:before{
+							content: '✔';
+							font-size: 1rem;
+							color: transparent;
+							text-shadow: 0 0 @grey;
+						}
+					}
+				}
+			}
+		}
+
+	// NEXT
+
+		#next{
+			.absPos();
+			text-align: center;
+			margin: auto;
+
 			display: flex;
+			flex-direction: column;
 			align-items: center;
 			justify-content: center;
-			border: none;
-			background: transparent;
-			background-color: @red;
-			border-radius: 60px;
-			overflow: hidden;
-			padding: 6px 13px 8px;
-			cursor: pointer;
+			padding-bottom: 150px;
 
-			span{
-				line-height: 1;
-				color: transparent;
-				text-shadow: 0 0 0 @white, 0 2px 1px @red_dark;
-				font-size: 1.15rem;
-				margin-right: 5px;
-			}
-
-			.abel(1.25rem, @white, bold);
-			.transition();
-
-			text-shadow: 0 2px 1px @red_dark;
-			box-shadow: 0 3px 0 0 @red_dark,
-					0 3px 8px 0 fade(@black, 15%);
-
-			&:hover{
-				top: 33px;
-				box-shadow: 0 0px 6px 0 fade(@black, 20%);
-			}
-
-		}
-
-		.title_pseudo{
-			margin-top: 20px;
-			padding: 2px;
-			text-align: center;
-			.abel(1.25rem, @white);
-			background-color: fade(@black, 50%);
-
-			span{
-				font-weight: bold;
-				color: @green;
-			}
-		}
-
-	}
-
-// LOBBY
-
-	#lobby{
-		padding: 30px;
-		.absPos();
-
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		align-items: center;
-
-		.new_player_form{
-			margin-top: auto;
-			width: 100%;
-			text-align: center;
-
-			h3{
-				margin-bottom: 15px;
-				.abel(1.75rem, @white, bold);
-			}
-
-			input{
-				display: block;
-				width: 100%;
-				margin-bottom: 5px;
-				padding: 25px 10px;
-				border: none;
-				border-radius: 5px;
-				.abel(1.35rem, @grey_black, bold);
+			h4{
+				.abel(1.5rem, @white);
 				text-align: center;
+			}
 
-				&:hover, &:active, &:focus{
-					outline: none;
-				}
+			h2{
+				color: crimson;
+				text-align: center;
+				margin: 20px auto 30px;
+				.sigmar(1.5rem, @green_dark);
+				background: @gold;
+				padding: 5px 30px;
+				border-radius: 100px;
 			}
 
 			button{
-				position: relative;
-				top: -15px;
+				font-size: 1.75rem;
+				width: 75%;
 				margin: 0 auto;
-				padding: 12px 50px;
-				background-color: @green;
-				border: none;
-				border-radius: 60px;
-				border: 2px solid @green_dark;
-				.abel(1.3rem, @black, bold);
+
+				&:hover{
+					transform: translateY(5px);
+				}
 			}
 		}
 
-		.players_list{
-			margin: auto 0;
-			padding: 30px 15px;
+	// END
 
+		#end_screen{
+			.absPos();
 			display: flex;
-			align-items: center;
+			flex-direction: column;
 			justify-content: center;
-			flex-wrap: wrap;
+			padding: 50px;
 
-			div{
-				padding: 5px 25px;
-				margin: 8px;
-				.abel(2rem, @green_dark, bold);
-				background-color: @gold;
-				border-radius: 100px;
-			}
-		}
-
-		button.start_game_btn{
-			margin: 30px 0;
-			width: 100%;
-
-			&:hover{
-				transform: translateY(5px);
-			}
-		}
-
-	}
-
-// DICES
-
-	.dice{
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 60px;
-		height: 60px;
-
-		border: 5px solid @dice;
-		border-radius: 8px;
-		background-color: @dice_bg;
-		box-shadow: 0px 0px 10px fade(@black, 20%);
-
-		svg{
-			width: 80%;
-			fill: @dice;
-			filter: drop-shadow(0px 0px 3px fade(@dice, 30%));
-		}
-
-		pointer-events: auto;
-		cursor: pointer;
-		opacity: 1;
-
-		&.invisible{
-			pointer-events: none;
-			visibility: hidden;
-			opacity: 0;
-			.transition(opacity, .35s);
-		}
-	}
-
-// GAME
-
-	#game{
-		.absPos();
-
-		width: 100%;
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		background-color: @green;
-
-		.dices_arena{
-			position: relative;
-			flex: 1 auto;
-			width: 100%;
-			padding-bottom: 30px;
-
-			& > div{
-				width: 100%;
-				height: 100%;
-				display: flex;
-				flex-direction: column;
-
-				align-items: center;
-				justify-content: space-evenly;
-			}
-		}
-
-		.dices_keep{
-			position: relative;
-			background: repeating-linear-gradient(
-				-45deg,
-				@green_dark,
-				@green_dark 12px,
-				fade(@black, 10%) 12px,
-				fade(@black, 10%) 18px
-			), @green_dark;
-
-			height: 20vh;
-			min-height: 120px;
-			display: flex;
-			align-items: center;
-
-			& > div{
-				width: 100%;
-				padding: 8px 30px 0;
-				position: relative;
+			h3{
+				margin-top: auto;
+				margin-bottom: 30px;
+				.sigmar(2.25rem, @red);
+				text-align: center;
+				text-shadow: 0 -1px 0 fade(@white, 60%), 0 3px 0px @red_dark, 0 3px 5px @green_dark;
 			}
 
-			.dice{
-				display: inline-flex;
-				border-color: @black;
-				width: 48px;
-				height: 48px;
-				margin-left: 10px;
-
-				svg{
-					fill: @black;
-				}
-			}
-
-			&:before{
-				content: '';
-				display: block;
-				position: absolute;
-				background: darken(@green_dark, 8%);
-				opacity: .9;
-
-				@pos: 10px;
-					top: @pos;
-					right: @pos;
-					bottom: @pos;
-					left: @pos;
-				border: 1px solid @white;
-				border-radius: 15px;
-				box-shadow: 0 0 8px fade(@white, 70%), inset 0 0 6px fade(@white, 55%);
-
-				user-select: none;
-				pointer-events: none;
-			}
-		}
-
-		#play_btn{
-			position: absolute;
-			transform: translateY(50%);
-			bottom: 5px;
-			left: 50px;
-			right: 50px;
-			z-index: 200;
-
-			&:active,
-			&:hover{
-				bottom: 0px;
-			}
-		}
-	}
-
-// SCOREBOARD
-
-	#scoreboard{
-		.absPos(900);
-		overflow-y: scroll;
-		background: fade(@white, 80%);
-		backdrop-filter: blur(5px) saturate(0.25);
-		padding: 75px 10px 15px;
-		padding-top: 75px;
-
-		// Scroll bar
-			&::-webkit-scrollbar {
-				width: 8px;
-			}
-			&::-webkit-scrollbar-track {
-				background: transparent;
-			}
-			&::-webkit-scrollbar-thumb {
-				background: @red;
-				border: 2px solid transparent;
-				border-radius:12px;
-			}
-			&::-webkit-scrollbar-thumb:hover {
-				background: @red_dark;
-			}
-			&::-webkit-scrollbar-button {
-				display:none
-			}
-
-		.close_score{
-			position: absolute;
-			top: 30px;
-			right: 30px - 8;
-			z-index: 999;
-			border: none;
-			background-color: @red;
-			border-radius: 100px;
-			overflow: hidden;
-			padding: 8px 45px;
-
-			font-size: 1.5rem;
-			color: @white;
-			font-weight: bold;
-			line-height: 1;
-
-			text-shadow: 0 2px 1px @red_dark;
-			box-shadow: 0 3px 0 0 @red_dark,
-					0 3px 8px 0 fade(@black, 15%);
-
-			&:hover{
-				top: 33px;
-				box-shadow: 0 0px 6px 0 fade(@black, 20%);
-			}
-		}
-
-		.scoreboard_title{
-			text-align: center;
-			.abel(1.5rem, @grey_black, bold);
-			margin: 15px auto;
-
-			span{
-				color: @green;
-				text-shadow: 0 0 3px @white;
-			}
-		}
-
-		.score_warp{
-			padding-left: 10px;
-			padding-right: 50px;
-
-			.line{
-				position: relative;
-				background-color: @white;
-				display: flex;
-				border: 1px solid @grey_dark;
-				border-bottom: none;
-
-				.abel(1rem, @grey, normal);
-
-				& > div{
-					flex: 2;
-					height: 32px;
-					line-height: 32px;
-					padding: 0 8px;
-					border-right: 1px solid #000;
-
-					&.name{
-						font-size: .9rem;
-						font-weight: bold;
-						text-align: right;
-
-						span{
-							display: none !important;
-						}
-					}
-
-					&.scoring{
-						text-align: center;
-						font-size: .8rem;
-					}
-
-					&.player_score{
-						flex: 1.5;
-						text-align: center;
-						font-weight: bold;
-					}
-				}
-
-				.choose_this{
-					position: absolute;
-					left: 100%;
-					top: 0;
-					bottom: 0px;
-
+			.final_scoreboard{
+				.final_line{
+					padding-bottom: 15px;
+					margin-bottom: 15px;
+					border-bottom: 1px solid fade(@white, 20%);
 					display: flex;
 					align-items: center;
-					justify-content: center;
-					height: auto;
-					width: 48px;
-					padding: 0;
-					padding-top: 5px;
-					background: @red;
-					border: 2px solid @red_dark;
-					border-left: none;
-					border-top-right-radius: 5px;
-					border-bottom-right-radius: 5px;
 
-					font-weight: bold;
-					color: @white;
-					cursor: pointer;
-
-					&.cancel{
-						border-color: @grey_black;
-						background: repeating-linear-gradient(
-							-45deg,
-							@grey,
-							@grey 4px,
-							@grey_dark 4px,
-							@grey_dark 8px
-						);
-						span{
-							display: none;
-						}
+					.ranked{
+						.abel(1.2rem, @green, bold);
+						margin-right: 15px;
 					}
 
-					&:hover{
-						background: @green;
+					.name{
+						.abel(1.35rem, @white, bold);
 					}
-				}
 
-				&.head_line{
-					background-color: @green_dark;
-					.abel(.9rem, @white, normal);
-					text-transform: uppercase;
-
-					& > div{
-						text-align: center;
+					button.score{
+						margin-left: auto;
 						border: none;
-					}
-					.lh_player_score{
-						flex: 1.5;
-					}
-				}
-
-				&.bonus{
-					background-color: #ccc;
-					border-bottom: 4px solid @green_dark;
-					.player_score{
-						color: @red;
-					}
-				}
-
-				&.total{
-					background-color: @grey_dark;
-					& > div{
-						color: @white;
-						border: none;
-
-						&.name{
-							flex: 5;
-						}
-						&.scoring{
-							display: none;
-						}
-					}
-				}
-
-				&.done:not(.total, .bonus){
-					background: fade(@green, 35%);
-				}
-			}
-
-			&.bonus_on .bonus{
-				background-color: @green;
-
-				.player_score{
-					color: @grey;
-					font-size: 0;
-
-					&:before{
-						content: '✔';
-						font-size: 1rem;
-						color: transparent;
-						text-shadow: 0 0 @grey;
+						border-radius: 20px;
+						padding: 8px 15px;
+						background-color: @gold;
+						.abel(1.35rem, @white, bold);
+						text-shadow: 0 2px 1px @green_dark, 0 0px 6px @green_dark;
 					}
 				}
 			}
-		}
-	}
 
-// NEXT
-
-	#next{
-		.absPos();
-		text-align: center;
-		margin: auto;
-
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding-bottom: 150px;
-
-		h4{
-			.abel(1.5rem, @white);
-			text-align: center;
-		}
-
-		h2{
-			color: crimson;
-			text-align: center;
-			margin: 20px auto 30px;
-			.sigmar(1.5rem, @green_dark);
-			background: @gold;
-			padding: 5px 30px;
-			border-radius: 100px;
-		}
-
-		button{
-			font-size: 1.75rem;
-			width: 75%;
-			margin: 0 auto;
-
-			&:hover{
-				transform: translateY(5px);
-			}
-		}
-	}
-
-// END
-
-	#end_screen{
-		.absPos();
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		padding: 50px;
-
-		h3{
-			margin-top: auto;
-			margin-bottom: 30px;
-			.sigmar(2.25rem, @red);
-			text-align: center;
-			text-shadow: 0 -1px 0 fade(@white, 60%), 0 3px 0px @red_dark, 0 3px 5px @green_dark;
-		}
-
-		.final_scoreboard{
-			.final_line{
-				padding-bottom: 15px;
-				margin-bottom: 15px;
-				border-bottom: 1px solid fade(@white, 20%);
-				display: flex;
-				align-items: center;
-
-				.ranked{
-					.abel(1.2rem, @green, bold);
-					margin-right: 15px;
-				}
-
-				.name{
-					.abel(1.35rem, @white, bold);
-				}
-
-				button.score{
-					margin-left: auto;
-					border: none;
-					border-radius: 20px;
-					padding: 8px 15px;
-					background-color: @gold;
-					.abel(1.35rem, @white, bold);
-					text-shadow: 0 2px 1px @green_dark, 0 0px 6px @green_dark;
-				}
+			.reset_btn{
+				margin: auto;
+				margin-bottom: 0;
+				width: 75%;
+				font-size: 1.35rem;
 			}
 		}
 
-		.reset_btn{
-			margin: auto;
-			margin-bottom: 0;
-			width: 75%;
-			font-size: 1.35rem;
-		}
-	}
 
 // TRANSITION
 

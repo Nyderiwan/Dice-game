@@ -1,77 +1,79 @@
 <template>
+	<div id="app-scc">
 
-	<div id="loading" v-if="state===0">
-		Chargement...
-	</div>
-
-	<header id="header_game">
-		<h1>Ship, <span>Captain</span> and Crew</h1>
-	</header>
-
-	<div id="lobby" v-if="state === 1">
-		<div class="new_player_form">
-			<h3>Ajouter un joueur</h3>
-			<input type="text" v-model="newPlayer" @keyup.enter="addPlayer" placeholder="Entrez un pseudo" maxlength="20">
-			<button @click="addPlayer">Valider</button>
+		<div id="loading" v-if="state===0">
+			Chargement...
 		</div>
-		<div class="players_list">
-			<div v-for="player in players">{{player.name}}</div>
-		</div>
-		<button @click="startGame" class="primary start_game_btn">Lancer la partie</button>
-		<button @click="startGameTest" class="primary start_game_btn">Start BETA game</button>
-	</div>
 
-	<div id="game" v-if="state === 2">
-		<header>
-			<div class="title_pseudo">Au tour de <span>{{players[currentPlayer].name }}</span> de jouer</div>
-
-			<div>
-				<div class="ship">
-					<span v-show="round.ship">⚡</span>
-				</div>
-				<div class="captain">
-					<span v-show="round.captain">⚡</span>
-				</div>
-				<div class="crew">
-					<span v-show="round.crew">⚡</span>
-				</div>
-				<div class="score">
-					<span>{{ round.score }}</span>
-				</div>
-			</div>
+		<header id="header_game">
+			<h1>Ship, <span>Captain</span> and Crew</h1>
 		</header>
 
-		<div class="game_inner">
-			<div class="dices_warp">
-				<transition-group name="dice" tag="div">
+		<div id="lobby" v-if="state === 1">
+			<div class="new_player_form">
+				<h3>Ajouter un joueur</h3>
+				<input type="text" v-model="newPlayer" @keyup.enter="addPlayer" placeholder="Entrez un pseudo" maxlength="20">
+				<button @click="addPlayer">Valider</button>
+			</div>
+			<div class="players_list">
+				<div v-for="player in players">{{player.name}}</div>
+			</div>
+			<button @click="startGame" class="primary start_game_btn">Lancer la partie</button>
+			<button @click="startGameTest" class="primary start_game_btn">Start BETA game</button>
+		</div>
+
+		<div id="game" v-if="state === 2">
+			<header>
+				<div class="title_pseudo">Au tour de <span>{{players[currentPlayer].name }}</span> de jouer</div>
+
 				<div>
-					<div
-						v-for="(dice, index) in dices"
-						class="dice"
-						:key="step+'_'+dice.value"
-						:ref="'dice_'+index">
-							<component :is="'Face'+dice"></component>
+					<div class="ship">
+						<span v-show="round.ship">⚡</span>
+					</div>
+					<div class="captain">
+						<span v-show="round.captain">⚡</span>
+					</div>
+					<div class="crew">
+						<span v-show="round.crew">⚡</span>
+					</div>
+					<div class="score">
+						<span>{{ round.score }}</span>
 					</div>
 				</div>
-				</transition-group>
+			</header>
+
+			<div class="game_inner">
+				<div class="dices_warp">
+					<transition-group name="dice" tag="div">
+					<div>
+						<div
+							v-for="(dice, index) in dices"
+							class="dice"
+							:key="step+'_'+dice.value"
+							:ref="'dice_'+index">
+								<component :is="'Face'+dice"></component>
+						</div>
+					</div>
+					</transition-group>
+				</div>
+
+				<button v-show="step < 3" @click="throwDices" class="btn_throw_dices primary">{{ jetBtnLabel }}</button>
+				<button v-show="step === 3 || round.score > 0" @click="nextRound" class="btn_end_round primary">Finir le tour</button>
 			</div>
-
-			<button v-show="step < 3" @click="throwDices" class="btn_throw_dices primary">{{ jetBtnLabel }}</button>
-			<button v-show="step === 3 || round.score > 0" @click="nextRound" class="btn_end_round primary">Finir le tour</button>
 		</div>
-	</div>
 
-	<div id="end" v-if="state === 3">
-		<h2>Scores</h2>
-		<div class="scoreboard">
-			<div v-for="(item, index) in scoreboardPlayers" :class="'p_'+index">
-				<div class="name">{{ item.name }}</div>
-				<div class="score">{{ item.score }}</div>
+		<div id="end" v-if="state === 3">
+			<h2>Scores</h2>
+			<div class="scoreboard">
+				<div v-for="(item, index) in scoreboardPlayers" :class="'p_'+index">
+					<div class="name">{{ item.name }}</div>
+					<div class="score">{{ item.score }}</div>
+				</div>
 			</div>
+			<button @click="newGame" class="reset_btn primary">Refaire un tour</button>
 		</div>
-		<button @click="newGame" class="reset_btn primary">Refaire un tour</button>
-	</div>
 
+	</div>
 </template>
 
 <script>
@@ -310,6 +312,6 @@
 	}
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 	@import "../assets/less/SCC.less";
 </style>

@@ -1,103 +1,105 @@
 <template>
-	<header id="header_game">
-		<h1><span>Yeah</span>tzee !</h1>
-		<template v-if="state === 2">
-			<div class="title_pseudo">Au tour de <span>{{players[currentPlayer].name }}</span> de jouer</div>
-			<div class="title_step" :class="'step_'+step" v-show="state === 2">
-				<div></div>
-				<div></div>
-				<div></div>
+	<div id="app-yeahtzee">
+		<header id="header_game">
+			<h1><span>Yeah</span>tzee !</h1>
+			<template v-if="state === 2">
+				<div class="title_pseudo">Au tour de <span>{{players[currentPlayer].name }}</span> de jouer</div>
+				<div class="title_step" :class="'step_'+step" v-show="state === 2">
+					<div></div>
+					<div></div>
+					<div></div>
+				</div>
+			</template>
+
+			<button id="score_btn" @click="showScore = true" v-if="state > 1 && state < 4"><span>⭐</span> Score</button>
+		</header>
+
+		<transition name="fade">
+			<div id="lobby" v-if="state === 1">
+				<div class="new_player_form">
+					<h3>Ajouter un joueur</h3>
+					<input type="text" v-model="newPlayer" @keyup.enter="addPlayer" placeholder="Entrez un pseudo" maxlength="20">
+					<button @click="addPlayer">Valider</button>
+				</div>
+				<div class="players_list">
+					<div v-for="player in players">{{player.name}}</div>
+				</div>
+				<button @click="startGame" class="primary start_game_btn">Lancer la partie</button>
 			</div>
-		</template>
+		</transition>
 
-		<button id="score_btn" @click="showScore = true" v-if="state > 1 && state < 4"><span>⭐</span> Score</button>
-	</header>
+		<transition name="fade">
+			<div id="game" v-if="state === 2">
+				<div class="dices_arena">
 
-	<transition name="fade">
-		<div id="lobby" v-if="state === 1">
-			<div class="new_player_form">
-				<h3>Ajouter un joueur</h3>
-				<input type="text" v-model="newPlayer" @keyup.enter="addPlayer" placeholder="Entrez un pseudo" maxlength="20">
-				<button @click="addPlayer">Valider</button>
-			</div>
-			<div class="players_list">
-				<div v-for="player in players">{{player.name}}</div>
-			</div>
-			<button @click="startGame" class="primary start_game_btn">Lancer la partie</button>
-		</div>
-	</transition>
+					<transition-group name="dice" tag="div">
+						<div
+							v-for="(dice, index) in dices"
+							class="dice" :class="{'invisible' : dice.keep}"
+							@click="dice.keep = true"
+							:key="step+'_'+dice.value"
+							:style="dice.css"
+							:ref="'dice_'+index">
+								<component :is="'Face'+dice.value"></component>
+						</div>
+					</transition-group>
 
-	<transition name="fade">
-		<div id="game" v-if="state === 2">
-			<div class="dices_arena">
+					<button @click="testPlay" id="play_btn" class="primary">{{ labelBtn }}</button>
+				</div>
 
-				<transition-group name="dice" tag="div">
-					<div
-						v-for="(dice, index) in dices"
-						class="dice" :class="{'invisible' : dice.keep}"
-						@click="dice.keep = true"
-						:key="step+'_'+dice.value"
-						:style="dice.css"
-						:ref="'dice_'+index">
-							<component :is="'Face'+dice.value"></component>
+				<div class="dices_keep">
+					<transition-group name="dicekeep" tag="div">
+					<div class="dice" :class="'d_'+dice.value" v-for="dice in keepDices" @click="dice.keep = false" :key="dice">
+						<component :is="'Face'+dice.value"></component>
 					</div>
-				</transition-group>
-
-				<button @click="testPlay" id="play_btn" class="primary">{{ labelBtn }}</button>
-			</div>
-
-			<div class="dices_keep">
-				<transition-group name="dicekeep" tag="div">
-				<div class="dice" :class="'d_'+dice.value" v-for="dice in keepDices" @click="dice.keep = false" :key="dice">
-					<component :is="'Face'+dice.value"></component>
+					</transition-group>
 				</div>
-				</transition-group>
 			</div>
-		</div>
-	</transition>
+		</transition>
 
-	<transition name="fade">
-		<div id="scoreboard" v-show="showScore" v-if="state > 1">
-			<button class="close_score" @click="showScore = false">×</button>
-			<div class="scoreboard_title">Score de <span>{{ players[currentPlayer].name }}</span></div>
-			<div class="score_warp" :class="{'bonus_on': players[currentPlayer].score['bonus']}">
-				<div class="line head_line">
-					<div class="lh_name">Combinaison</div>
-					<div class="lh_scoring">Valeur</div>
-					<div class="lh_player_score">Score</div>
-				</div>
-				<div v-for="item in tempScore" :class="[item.id, 'line', {'done': (item.will_do === null)}]">
-					<div class="name">{{ item.name }}
-						<span v-if="item.desc">{{ item.desc }}</span>
+		<transition name="fade">
+			<div id="scoreboard" v-show="showScore" v-if="state > 1">
+				<button class="close_score" @click="showScore = false">×</button>
+				<div class="scoreboard_title">Score de <span>{{ players[currentPlayer].name }}</span></div>
+				<div class="score_warp" :class="{'bonus_on': players[currentPlayer].score['bonus']}">
+					<div class="line head_line">
+						<div class="lh_name">Combinaison</div>
+						<div class="lh_scoring">Valeur</div>
+						<div class="lh_player_score">Score</div>
 					</div>
-					<div class="scoring">{{ item.scoring }}</div>
-					<div class="player_score">{{ item.player_score }}</div>
-					<div class="choose_this" v-if="state === 2 && step > 0 && (item.will_do != null)" @click="chooseObj(item.id)" :class="item.will_do === 0 ? 'cancel':''">{{ item.will_do }}</div>
+					<div v-for="item in tempScore" :class="[item.id, 'line', {'done': (item.will_do === null)}]">
+						<div class="name">{{ item.name }}
+							<span v-if="item.desc">{{ item.desc }}</span>
+						</div>
+						<div class="scoring">{{ item.scoring }}</div>
+						<div class="player_score">{{ item.player_score }}</div>
+						<div class="choose_this" v-if="state === 2 && step > 0 && (item.will_do != null)" @click="chooseObj(item.id)" :class="item.will_do === 0 ? 'cancel':''">{{ item.will_do }}</div>
+					</div>
 				</div>
 			</div>
+		</transition>
+
+		<div id="next" v-if="state === 3">
+			<h4>C'est au joueur suivant</h4>
+			<h2>{{ players[nextPlayer].name }}</h2>
+			<button class="primary" @click="nextRound">Yahtzee !</button>
 		</div>
-	</transition>
 
-	<div id="next" v-if="state === 3">
-		<h4>C'est au joueur suivant</h4>
-		<h2>{{ players[nextPlayer].name }}</h2>
-		<button class="primary" @click="nextRound">Yahtzee !</button>
-	</div>
+		<div id="end_screen" v-if="state === 4">
+			<h3>Fin de la partie !</h3>
 
-	<div id="end_screen" v-if="state === 4">
-		<h3>Fin de la partie !</h3>
+			<div class="final_scoreboard">
 
-		<div class="final_scoreboard">
+				<div v-for="(player, idx) in playersByScore" class="final_line">
+					<div class="ranked">#{{ idx + 1 }}</div>
+					<div class="name">{{ player.name }}</div>
+					<button class="score" @click="showScoreEnd(player.id)">{{ player.finalTotal }} points</button>
+				</div>
 
-			<div v-for="(player, idx) in playersByScore" class="final_line">
-				<div class="ranked">#{{ idx + 1 }}</div>
-				<div class="name">{{ player.name }}</div>
-				<button class="score" @click="showScoreEnd(player.id)">{{ player.finalTotal }} points</button>
 			</div>
 
+			<button @click="reset" class="reset_btn primary">Retour</button>
 		</div>
-
-		<button @click="reset" class="reset_btn primary">Retour</button>
 	</div>
 </template>
 
@@ -533,6 +535,6 @@
 	}
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 	@import "../assets/less/yeahtzee.less";
 </style>

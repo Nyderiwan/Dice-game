@@ -1,5 +1,8 @@
 <template>
-	<components :is="diceGame"/>
+	<Home v-if="view === 0" @changeView="setView"/>
+		<Yeahtzee v-if="view === 1" />
+		<ShipCaptainCrew v-if="view === 2" />
+	<!-- <component v-bind:is="diceGame"></component> -->
 </template>
 
 <script>
@@ -19,15 +22,22 @@
 			diceGame(){
 				switch (this.view) {
 					case 1:
-						return ShipCaptainCrew
+						console.log('Yeahtzee')
+						return 'Yeahtzee'
 						break;
 					case 2:
-						return ShipCaptainCrew
+						console.log('Ship')
+						return 'ShipCaptainCrew'
 						break;
 					default:
-						return Home
+						return 'Home'
 						break;
 				}
+			}
+		},
+		methods: {
+			setView(idV){
+				this.view = idV
 			}
 		},
 		mounted(){
@@ -37,6 +47,8 @@
 			if(urlPath === '/') this.view = 0
 			if(urlPath === '/yeahtzee') this.view = 1
 			if(urlPath === '/ship-captain-crew') this.view = 2
+
+				console.log('urlPath', urlPath, this.view)
 		},
 		components: {
 			Home, Yeahtzee, ShipCaptainCrew
@@ -44,4 +56,20 @@
 	}
 </script>
 
-<style lang="less"></style>
+<style lang="less">
+	*{
+		box-sizing: border-box;
+		padding: 0;
+		margin: 0;
+		user-select: none;
+	}
+
+	body{
+		background-color: #2b3037;
+	}
+
+	button{
+		cursor: pointer;
+	}
+
+</style>
