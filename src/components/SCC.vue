@@ -1,112 +1,127 @@
 <template>
 	<div id="app-scc">
 
-		<div id="loading" v-if="state===0">
-			Chargement...
-		</div>
+		<transition name="fade">
+			<div id="loading" v-if="loading">
+				<div class="looping-rhombuses-spinner">
+					<div class="rhombus"></div>
+					<div class="rhombus"></div>
+					<div class="rhombus"></div>
+				</div>
+			</div>
+		</transition>
 
-		<header id="header_game">
-			<h1>Ship, <span>Captain</span> and Crew</h1>
+		<header id="header">
+			<h1>Ship, Captain and Crew</h1>
 		</header>
 
-		<div id="lobby" v-if="state === 1">
-			<div class="new_player_form">
-				<h3>Ajouter un joueur</h3>
-				<input type="text" v-model="newPlayer" @keyup.enter="addPlayer" placeholder="Entrez un pseudo" maxlength="20">
-				<button @click="addPlayer">Valider</button>
-			</div>
-			<div class="players_list">
-				<div v-for="player in players">{{player.name}}</div>
-			</div>
-			<button @click="startGame" class="primary start_game_btn">Lancer la partie</button>
-			<button @click="startGameTest" class="primary start_game_btn">Start BETA game</button>
-		</div>
+		<div class="inner_app">
 
-		<div id="game" v-if="state === 2">
-			<header>
-				<div class="title_pseudo">Au tour de <span>{{players[currentPlayer].name }}</span> de jouer</div>
-
-				<div>
-					<div class="ship">
-						<span v-show="round.ship">⚡</span>
-					</div>
-					<div class="captain">
-						<span v-show="round.captain">⚡</span>
-					</div>
-					<div class="crew">
-						<span v-show="round.crew">⚡</span>
-					</div>
-					<div class="score">
-						<span>{{ round.score }}</span>
-					</div>
+			<transition name="fade">
+			<div id="lobby" v-if="state === 1">
+				<div class="new_player_form">
+					<h3>Ajouter un joueur</h3>
+					<input type="text" v-model="newPlayer" @keyup.enter="addPlayer" placeholder="Entrez un pseudo" maxlength="20">
+					<button @click="addPlayer" class="out">Valider</button>
 				</div>
-			</header>
+				<div class="players_list">
+					<div v-for="player in players">{{player.name}}</div>
+				</div>
 
-			<div class="game_inner">
+				<button @click="startGame" class="start_game_btn"><svgAnchor/>Lancer la partie</button>
+			</div></transition>
+
+			<transition name="fade">
+			<div id="game" v-if="state === 2">
+
+				<header>
+					<div class="round_name">
+						<span>{{players[currentPlayer].name }}</span>
+					</div>
+
+					<div class="validates_icons">
+						<div class="ship" :class="{'on': round.ship}">
+							<svgShip/>
+						</div>
+						<div class="captain" :class="{'on': round.captain}">
+							<svgCaptain/>
+						</div>
+						<div class="crew" :class="{'on': round.crew}">
+							<svgCrew/>
+						</div>
+						<div class="score">
+							<span>{{ round.score }}</span>
+						</div>
+					</div>
+				</header>
+
 				<div class="dices_warp">
 					<transition-group name="dice" tag="div">
-					<div>
 						<div
 							v-for="(dice, index) in dices"
 							class="dice"
-							:key="step+'_'+dice.value"
+							:key="step+'_'+dice"
 							:ref="'dice_'+index">
 								<component :is="'Face'+dice"></component>
+								<Dice :number="dice"></Dice>
 						</div>
-					</div>
 					</transition-group>
 				</div>
 
-				<button v-show="step < 3" @click="throwDices" class="btn_throw_dices primary">{{ jetBtnLabel }}</button>
-				<button v-show="step === 3 || round.score > 0" @click="nextRound" class="btn_end_round primary">Finir le tour</button>
-			</div>
-		</div>
-
-		<div id="end" v-if="state === 3">
-			<h2>Scores</h2>
-			<div class="scoreboard">
-				<div v-for="(item, index) in scoreboardPlayers" :class="'p_'+index">
-					<div class="name">{{ item.name }}</div>
-					<div class="score">{{ item.score }}</div>
+				<div class="steps">
+					<div :class="{'on': step > 0}">💀</div>
+					<div :class="{'on': step > 1}">💀</div>
+					<div :class="{'on': step > 2}">💀</div>
 				</div>
-			</div>
-			<button @click="newGame" class="reset_btn primary">Refaire un tour</button>
+
+				<div class="btns_warp">
+					<button
+						:class="{'disable': (step > 2)}"
+						@click="throwDices"
+						class="btn_throw_dices"
+					><svgAnchor/>Lancer les dés</button>
+
+					<button
+						:class="{'disable': !(step === 3 || round.score > 0)}"
+						@click="nextRound"
+						class="btn_end_round"
+					><svgAnchor/>Finir le tour</button>
+				</div>
+
+			</div></transition>
+
+			<transition name="fade">
+			<div id="end" v-if="state === 3">
+				<h2>Scores</h2>
+				<div class="scoreboard">
+					<div v-for="(item, index) in scoreboardPlayers" :class="'p_'+index">
+						<div class="name">{{ item.name }}</div>
+						<div class="score">{{ item.score }}</div>
+					</div>
+				</div>
+				<button @click="newGame" class="reset_btn primary"><svgAnchor/>Refaire un tour</button>
+			</div></transition>
+
 		</div>
 
 	</div>
 </template>
 
 <script>
-	/*
-		<transition name="fade">
+	import orderBy from 'lodash/orderBy';
 
-		rolling paper animation
-		- https://www.youtube.com/watch?v=hcV7AcNuXjM
-
-		STATE
-		-
-		0 - Loading...
-		1 - Lobby
-		2 - Game
-		3 - End Score
-
-	*/
-
-	import _ from 'lodash'
-
-	// Dice Faces
-	import Face1 from '../assets/dice/face_1.svg'
-	import Face2 from '../assets/dice/face_2.svg'
-	import Face3 from '../assets/dice/face_3.svg'
-	import Face4 from '../assets/dice/face_4.svg'
-	import Face5 from '../assets/dice/face_5.svg'
-	import Face6 from '../assets/dice/face_6.svg'
+	import Dice from './_inc/Dices.vue'
+	import svgAnchor from '../assets/svg/anchor.svg'
+	import svgShip from '../assets/svg/ship.svg'
+	import svgCaptain from '../assets/svg/captain.svg'
+	import svgCrew from '../assets/svg/crew.svg'
 
 	export default {
 		data() {
 			return {
+				loading: true,
 				newPlayer: '',
-				state: 0,
+				state: 1,
 				players: [],
 				currentPlayer: null,
 				dices : [],
@@ -119,25 +134,22 @@
 				}
 			}
 		},
-		computed: {
-			jetBtnLabel(){
-				switch (this.step) {
-					case 0:
-						return 'Premier lancé'
-						break;
-					case 1:
-						return 'Deuxième lancé'
-						break;
-					case 2:
-						return 'Dernier lancé'
-						break;
-					case 3:
-						return 'Error'
-						break;
-				}
+		head: {
+			title: {
+				inner: 'Ship, Captain and Crew',
+				separator: '🌴'
 			},
+			meta: [
+				{ name: 'description', content: 'Ship Captain and Crew is a dice game perfect for party !' },
+				{ name: 'theme-color', content: '#242423' },
+			],
+			link: [
+				{ rel: 'icon', href: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚓</text></svg>" }
+			]
+		},
+		computed: {
 			scoreboardPlayers(){
-				return _.orderBy(this.players, 'score', 'desc');
+				return orderBy(this.players, 'score', 'desc');
 			},
 			isEveryoneLooser(){
 				for(let player of this.players) {
@@ -147,19 +159,6 @@
 			}
 		},
 		methods: {
-			startGameTest(){
-				this.players = [
-					{
-						name: 'Alpha',
-						score: 0
-					},
-					{
-						name: 'Bravo',
-						score: 0
-					},
-				]
-				this.startGame()
-			},
 			addPlayer(){
 				let tmpPseudo = this.newPlayer.trim()
 				if(tmpPseudo.length < 4) return false
@@ -170,6 +169,7 @@
 				this.newPlayer = ''
 			},
 			startGame(){
+				if(this.players.length < 2) return false
 				this.currentPlayer = 0
 				this.players = this.shuffle(this.players)
 
@@ -185,6 +185,7 @@
 				//
 				this.dices = []
 				this.step = 0
+				console.log('Cest a Bernard de Jouer !')
 			},
 			throwDices(){
 				this.dices = []
@@ -201,7 +202,9 @@
 
 				// wait 2s ----
 				// Test Dices
-				this.testDices()
+				setTimeout(() => {
+					this.testDices()
+				}, 1500)
 
 				this.step++
 			},
@@ -272,9 +275,9 @@
 				this.players = []
 				this.currentPlayer = 0
 
-				for (var i = 0; i < this.players.length; i++) {
+				for (var i = 0; i < tmpArray.length; i++) {
 					let y = i + 1
-					if(i === (this.players.length-1)) y = 0
+					if(i === (tmpArray.length-1)) y = 0
 
 					console.log('>', tmpArray[i])
 
@@ -296,18 +299,12 @@
 			}
 		},
 		mounted(){
-			/*
-			console.log('Hello you, welcome on Ship, Captain and Crew !')
-			document.title = 'Ship, Captain and Crew 🌴';
-
-			const favicon = document.getElementById("favicon");
-			let newFavicon = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚓</text></svg>"
-			favicon.href = newFavicon;
-			*/
-			this.state = 1
+		    setTimeout(() => {
+				this.loading = false
+			}, 1200)
 		},
 		components: {
-			Face1, Face2, Face3, Face4, Face5, Face6
+			Dice, svgAnchor, svgShip, svgCaptain, svgCrew
 		}
 	}
 </script>

@@ -40,7 +40,7 @@
 							:key="step+'_'+dice.value"
 							:style="dice.css"
 							:ref="'dice_'+index">
-								<component :is="'Face'+dice.value"></component>
+								<Dice :number="dice.value"></Dice>
 						</div>
 					</transition-group>
 
@@ -50,7 +50,7 @@
 				<div class="dices_keep">
 					<transition-group name="dicekeep" tag="div">
 					<div class="dice" :class="'d_'+dice.value" v-for="dice in keepDices" @click="dice.keep = false" :key="dice">
-						<component :is="'Face'+dice.value"></component>
+						<Dice :number="dice.value"></Dice>
 					</div>
 					</transition-group>
 				</div>
@@ -104,113 +104,110 @@
 </template>
 
 <script>
-	import _ from 'lodash'
-	// Dice Faces
-	import Face1 from '../assets/dice/face_1.svg'
-	import Face2 from '../assets/dice/face_2.svg'
-	import Face3 from '../assets/dice/face_3.svg'
-	import Face4 from '../assets/dice/face_4.svg'
-	import Face5 from '../assets/dice/face_5.svg'
-	import Face6 from '../assets/dice/face_6.svg'
+	// import _ from 'lodash'
+	import orderBy from 'lodash/orderBy';
+
+	// Dice custom component
+	import Dice from './_inc/Dices.vue'
 
 	// Yahtzee combinaisons & base score for players
-	const yahtzeeRules = [
-		{
-			id: 'aces',
-			name: 'Aces',
-			scoring: 'Total des 1'
-		},
-		{
-			id: 'twos',
-			name: 'Twos',
-			scoring: 'Total des 2'
-		},
-		{
-			id: 'threes',
-			name: 'Threes',
-			scoring: 'Total des 3'
-		},
-		{
-			id: 'fours',
-			name: 'Fours',
-			scoring: 'Total des 4'
-		},
-		{
-			id: 'fives',
-			name: 'Fives',
-			scoring: 'Total des 5'
-		},
-		{
-			id: 'sixes',
-			name: 'Sixes',
-			scoring: 'Total des 6'
-		},
-		{
-			id: 'bonus',
-			name: 'Bonus',
-			desc: 'If score > 63',
-			scoring: '35'
-		},
-		{
-			id: '3kind',
-			name: '3 of a Kind',
-			scoring: 'Total'
-		},
-		{
-			id: '4kind',
-			name: '4 of a Kind',
-			scoring: 'Total'
-		},
-		{
-			id: 'fullhouse',
-			name: 'Full House',
-			desc: '',
-			scoring: '25'
-		},
-		{
-			id: 'ss',
-			name: 'Small Straight',
-			desc: 'sequence of 4',
-			scoring: '30'
-		},
-		{
-			id: 'ls',
-			name: 'Large Straight',
-			desc: 'sequence of 5',
-			scoring: '40'
-		},
-		{
-			id: 'yahtzee',
-			name: 'Yahtzee',
-			desc: '5 of a kind',
-			scoring: '50'
-		},
-		{
-			id: 'chance',
-			name: 'Chance',
-			scoring: 'Total'
-		},
-		{
-			id: 'total',
-			name: 'Total',
+		const yahtzeeRules = [
+			{
+				id: 'aces',
+				name: 'Aces',
+				scoring: 'Total des 1'
+			},
+			{
+				id: 'twos',
+				name: 'Twos',
+				scoring: 'Total des 2'
+			},
+			{
+				id: 'threes',
+				name: 'Threes',
+				scoring: 'Total des 3'
+			},
+			{
+				id: 'fours',
+				name: 'Fours',
+				scoring: 'Total des 4'
+			},
+			{
+				id: 'fives',
+				name: 'Fives',
+				scoring: 'Total des 5'
+			},
+			{
+				id: 'sixes',
+				name: 'Sixes',
+				scoring: 'Total des 6'
+			},
+			{
+				id: 'bonus',
+				name: 'Bonus',
+				desc: 'If score > 63',
+				scoring: '35'
+			},
+			{
+				id: '3kind',
+				name: '3 of a Kind',
+				scoring: 'Total'
+			},
+			{
+				id: '4kind',
+				name: '4 of a Kind',
+				scoring: 'Total'
+			},
+			{
+				id: 'fullhouse',
+				name: 'Full House',
+				desc: '',
+				scoring: '25'
+			},
+			{
+				id: 'ss',
+				name: 'Small Straight',
+				desc: 'sequence of 4',
+				scoring: '30'
+			},
+			{
+				id: 'ls',
+				name: 'Large Straight',
+				desc: 'sequence of 5',
+				scoring: '40'
+			},
+			{
+				id: 'yahtzee',
+				name: 'Yahtzee',
+				desc: '5 of a kind',
+				scoring: '50'
+			},
+			{
+				id: 'chance',
+				name: 'Chance',
+				scoring: 'Total'
+			},
+			{
+				id: 'total',
+				name: 'Total',
+			}
+		]
+		const baseScore = {
+			'aces': null,
+			'twos': null,
+			'threes': null,
+			'fours': null,
+			'fives': null,
+			'sixes': null,
+			'bonus': false,
+			'3kind': null,
+			'4kind': null,
+			'fullhouse': null,
+			'ss': null,
+			'ls': null,
+			'yahtzee': null,
+			'chance': null,
 		}
-	]
-	const baseScore = {
-		'aces': null,
-		'twos': null,
-		'threes': null,
-		'fours': null,
-		'fives': null,
-		'sixes': null,
-		'bonus': false,
-		'3kind': null,
-		'4kind': null,
-		'fullhouse': null,
-		'ss': null,
-		'ls': null,
-		'yahtzee': null,
-		'chance': null,
-	}
 
 	export default {
 		data() {
@@ -291,7 +288,7 @@
 					tmpPlayers[key].finalTotal = tmpPlayers[key].total
 					if(tmpPlayers[key].score['bonus']) tmpPlayers[key].finalTotal += 35
 				}
-				return _.orderBy(tmpPlayers, ['finalTotal', 'name'], ['desc', 'asc'])
+				return orderBy(tmpPlayers, ['finalTotal', 'name'], ['desc', 'asc'])
 			}
 		},
 		methods: {
@@ -523,15 +520,16 @@
 					return a;
 				}
 		},
-		created (){
-			document.title = 'Yeahtzee 🎲';
-			const favicon = document.getElementById("favicon");
-			let newFavicon = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>"
-			favicon.href = newFavicon;
+		head: {
+			title: {
+				inner: 'Yeahtzee !',
+				separator: '🎲'
+			},
+			meta: [
+				{ name: 'theme-color', content: '#26547c' },
+			]
 		},
-		components: {
-			Face1, Face2, Face3, Face4, Face5, Face6
-		}
+		components: { Dice }
 	}
 </script>
 

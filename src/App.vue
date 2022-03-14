@@ -1,57 +1,26 @@
 <template>
-	<Home v-if="view === 0" @changeView="setView"/>
-		<Yeahtzee v-if="view === 1" />
-		<ShipCaptainCrew v-if="view === 2" />
-	<!-- <component v-bind:is="diceGame"></component> -->
+	<router-view v-slot="{ Component }">
+		<transition name="fade" mode="out-in">
+			<component :is="Component" />
+		</transition>
+	</router-view>
 </template>
 
 <script>
-	import Home from './components/Home.vue'
-	// 1
-	import Yeahtzee from './components/Yeahtzee.vue'
-	// 2
-	import ShipCaptainCrew from './components/SCC.vue'
-
 	export default {
-		data() {
-			return {
-				view: 0
-			}
-		},
-		computed: {
-			diceGame(){
-				switch (this.view) {
-					case 1:
-						console.log('Yeahtzee')
-						return 'Yeahtzee'
-						break;
-					case 2:
-						console.log('Ship')
-						return 'ShipCaptainCrew'
-						break;
-					default:
-						return 'Home'
-						break;
-				}
-			}
-		},
-		methods: {
-			setView(idV){
-				this.view = idV
-			}
-		},
 		mounted(){
 			console.log('init Dice Game • Squalala • V 0.1');
-
-			let urlPath = window.location.pathname
-			if(urlPath === '/') this.view = 0
-			if(urlPath === '/yeahtzee') this.view = 1
-			if(urlPath === '/ship-captain-crew') this.view = 2
-
-				console.log('urlPath', urlPath, this.view)
 		},
-		components: {
-			Home, Yeahtzee, ShipCaptainCrew
+		head: {
+			title: {
+				inner: '',
+				separator: '🎲',
+				complement : 'Squalala Dice Games',
+			},
+			link: [
+				{ rel: 'icon', href: "https://squalala.fr/favicon.ico" },
+				{ rel: 'manifest', href: "./manifest.webmanifest" }
+			]
 		}
 	}
 </script>
@@ -63,13 +32,32 @@
 		margin: 0;
 		user-select: none;
 	}
-
 	body{
 		background-color: #2b3037;
+		overflow: hidden;
+		height: 100vh;
+		width: 100vw;
 	}
-
 	button{
 		cursor: pointer;
 	}
+
+	// Fade
+
+		.fade-enter-active,
+		.fade-leave-active{
+			transition: opacity .5s ease;
+		}
+
+		.fade-enter-from,
+		.fade-leave-to{
+			opacity: 0;
+		}
+
+		.fade-enter-to,
+		.fade-leave-from{
+			opacity: 1;
+		}
+
 
 </style>
